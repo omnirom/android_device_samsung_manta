@@ -15,4 +15,4 @@
 #
 
 add_lunch_combo full_manta-userdebug
-add_lunch_combo custom_manta-userdebug
+add_lunch_combo omni_manta-userdebug

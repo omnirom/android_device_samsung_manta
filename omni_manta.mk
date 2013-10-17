@@ -36,12 +36,12 @@ PRODUCT_PROPERTY_OVERRIDES := \
 # Inherit from those products. Most specific first.
 $(call inherit-product, $(SRC_TARGET_DIR)/product/aosp_base.mk)
 # Inherit from our custom product configuration
-$(call inherit-product, vendor/custom/config/common.mk)
+$(call inherit-product, vendor/omni/config/common.mk)
 # Inherit from hardware-specific part of the product configuration
 $(call inherit-product, device/samsung/manta/device.mk)
 
 
-PRODUCT_NAME := custom_manta
+PRODUCT_NAME := omni_manta
 PRODUCT_DEVICE := manta
 PRODUCT_BRAND := Android
 PRODUCT_MODEL := Nexus 10
