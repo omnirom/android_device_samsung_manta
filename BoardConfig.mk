@@ -82,6 +82,9 @@ TARGET_RECOVERY_UI_LIB := librecovery_ui_manta
 TARGET_RECOVERY_UPDATER_LIBS += librecovery_updater_manta
 TARGET_RELEASETOOLS_EXTENSIONS := device/samsung/manta
 
+TARGET_KERNEL_SOURCE := kernel/samsung/manta
+TARGET_KERNEL_CONFIG := omni_manta_defconfig
+
 DEVICE_RESOLUTION := 2560x1600
 
 BOARD_SEPOLICY_DIRS := \
