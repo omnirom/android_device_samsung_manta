@@ -81,13 +81,21 @@ BOARD_HAL_STATIC_LIBRARIES := libhealthd.manta libdumpstate.manta
 
 BOARD_CHARGER_DISABLE_INIT_BLANK := true
 
-TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
-TARGET_RECOVERY_UI_LIB := librecovery_ui_manta
-TARGET_RECOVERY_UPDATER_LIBS += librecovery_updater_manta
 TARGET_RELEASETOOLS_EXTENSIONS := device/samsung/manta
 
+#TWRP
+TARGET_RECOVERY_UI_LIB := librecovery_ui_manta
+TARGET_RECOVERY_UPDATER_LIBS += librecovery_updater_manta
+TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
 DEVICE_RESOLUTION := 2560x1600
+RECOVERY_SDCARD_ON_DATA := true
+TW_INTERNAL_STORAGE_PATH := "/data/media/0"
+TW_INTERNAL_STORAGE_MOUNT_POINT := "data"
+TW_EXTERNAL_STORAGE_PATH := "/usb-otg"
+TW_EXTERNAL_STORAGE_MOUNT_POINT := "usb-otg"
+TARGET_RECOVERY_INITRC := device/samsung/manta/init.recovery.rc
 
+#SELinux
 BOARD_SEPOLICY_DIRS := \
 	device/samsung/manta/sepolicy
 
