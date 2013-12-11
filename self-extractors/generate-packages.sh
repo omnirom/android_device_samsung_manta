@@ -61,6 +61,12 @@ then
   ZIP=mantaray-ota-737497
   BUILD=jwr66v
 fi # jb-mr2-dev
+if test $BRANCH = klp-dev
+then
+  ZIP=mantaray-ota-937116
+  BUILD=kot49h
+fi # klp-dev
+
 ROOTDEVICE=manta
 DEVICE=manta
 MANUFACTURER=samsung
