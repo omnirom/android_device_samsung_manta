@@ -97,6 +97,9 @@ PRODUCT_PACKAGES += \
     Tag \
     com.android.nfc_extras
 
+# OmniTorch
+PRODUCT_PACKAGES += OmniTorch
+
 # NFCEE access control
 ifeq ($(TARGET_BUILD_VARIANT),user)
     NFCEE_ACCESS_PATH := device/samsung/manta/nfc/nfcee_access.xml
