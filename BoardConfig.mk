@@ -94,6 +94,7 @@ TW_INTERNAL_STORAGE_PATH := "/data/media/0"
 TW_INTERNAL_STORAGE_MOUNT_POINT := "data"
 TW_EXTERNAL_STORAGE_PATH := "/usb-otg"
 TW_EXTERNAL_STORAGE_MOUNT_POINT := "usb-otg"
+TW_CUSTOM_BATTERY_PATH := "/sys/class/power_supply/manta-battery"
 # TARGET_RECOVERY_INITRC := device/samsung/manta/init.recovery.rc
 
 #SELinux

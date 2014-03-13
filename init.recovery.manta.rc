@@ -1,6 +1,9 @@
 on init
     start watchdogd
 
+    # Symlink the charger status so TWRP can read it
+    symlink /sys/class/power_supply/smb347-battery/status /sys/class/power_supply/manta-battery/status
+
 # Set watchdog timer to 30 seconds and pet it every 10 seconds to get a 20 second margin
 service watchdogd /sbin/watchdogd 10 20
     class core
