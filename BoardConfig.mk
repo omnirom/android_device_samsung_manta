@@ -84,6 +84,7 @@ BOARD_CHARGER_DISABLE_INIT_BLANK := true
 TARGET_RELEASETOOLS_EXTENSIONS := device/samsung/manta
 
 #TWRP
+TARGET_PREBUILT_KERNEL := device/samsung/manta/kernel
 TARGET_RECOVERY_UI_LIB := librecovery_ui_manta
 TARGET_RECOVERY_UPDATER_LIBS += librecovery_updater_manta
 TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
