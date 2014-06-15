@@ -182,4 +182,7 @@
 
     <!-- Translucent status & navigation bars perform poorly on this device -->
     <bool name="config_enableTranslucentDecor">true</bool>
+
+    <!-- If this is true, the screen will fade off. -->
+    <bool name="config_animateScreenLights">false</bool>
 </resources>
