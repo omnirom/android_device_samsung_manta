@@ -105,4 +105,8 @@ BOARD_SEPOLICY_UNION := \
 	file.te \
 	mediaserver.te \
 	surfaceflinger.te \
-	system.te
+	system.te \
+	system_server.te
+
+MALLOC_IMPL := dlmalloc
+>>>>>>> 744b4d5... Indicate this uses dlmalloc.
