@@ -22,6 +22,7 @@
 #include <malloc.h>
 #include <pthread.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "IioSensorBase.h"
 
