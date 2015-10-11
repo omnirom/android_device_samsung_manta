@@ -1,0 +1,533 @@
+From a1201879d653034378a73419df308694fdc83301 Mon Sep 17 00:00:00 2001
+From: Dmitry Grinberg <dmitrygr@gmail.com>
+Date: Sat, 10 Oct 2015 10:16:13 +0000
+Subject: [PATCH] Support M
+
+---
+ BoardConfig.mk                  |  15 +--
+ bluetooth/bdroid_buildcfg.h     |   4 -
+ bubblelevel/BubbleLevelImpl.cpp |   2 +-
+ device.mk                       |   7 ++
+ init.manta.rc                   |  18 ----
+ libdmitry/Android.mk            |  26 +++++
+ libdmitry/libdmitry.c           | 207 ++++++++++++++++++++++++++++++++++++++++
+ libsensors/IioSensorBase.cpp    |   2 +
+ libsensors/SensorBase.cpp       |   1 +
+ sepolicy/batteryproperties.te   |   9 ++
+ sepolicy/file_contexts          |  12 ++-
+ sepolicy/fsck.te                |   3 +
+ sepolicy/gpsd.te                |  11 ++-
+ sepolicy/healthd.te             |   1 +
+ sepolicy/mediaserver.te         |   3 +
+ sepolicy/netd.te                |   1 +
+ sepolicy/system_server.te       |   2 +
+ sepolicy/vold.te                |   1 +
+ 18 files changed, 285 insertions(+), 40 deletions(-)
+ create mode 100755 libdmitry/Android.mk
+ create mode 100755 libdmitry/libdmitry.c
+ create mode 100755 sepolicy/batteryproperties.te
+ create mode 100755 sepolicy/fsck.te
+ create mode 100755 sepolicy/netd.te
+ create mode 100755 sepolicy/vold.te
+
+diff --git a/BoardConfig.mk b/BoardConfig.mk
+index fe5e4fe..c7a297c 100644
+--- a/BoardConfig.mk
++++ b/BoardConfig.mk
+@@ -61,6 +61,10 @@ BOARD_CACHEIMAGE_PARTITION_SIZE := 553648128
+ BOARD_CACHEIMAGE_FILE_SYSTEM_TYPE := ext4
+ BOARD_FLASH_BLOCK_SIZE := 4096
+ 
++WITH_DEXPREOPT_BOOT_IMG_ONLY ?= false
++WITH_DEXPREOPT := false
++DONT_DEXPREOPT_PREBUILTS := true
++
+ #TARGET_PROVIDES_INIT_RC := true
+ #TARGET_USERIMAGES_SPARSE_EXT_DISABLED := true
+ 
+@@ -85,17 +89,6 @@ TARGET_RELEASETOOLS_EXTENSIONS := device/samsung/manta
+ BOARD_SEPOLICY_DIRS += \
+ 	device/samsung/manta/sepolicy
+ 
+-BOARD_SEPOLICY_UNION += \
+-	file_contexts \
+-	device.te \
+-	domain.te \
+-	drmserver.te \
+-	healthd.te \
+-	gpsd.te \
+-	file.te \
+-	mediaserver.te \
+-	system_server.te
+-
+ MALLOC_IMPL := dlmalloc
+ 
+ BOARD_INV_LIBMLLITE_FROM_SOURCE := true
+diff --git a/bluetooth/bdroid_buildcfg.h b/bluetooth/bdroid_buildcfg.h
+index 8557fdd..bea7e59 100644
+--- a/bluetooth/bdroid_buildcfg.h
++++ b/bluetooth/bdroid_buildcfg.h
+@@ -26,8 +26,4 @@
+ 
+ #define BTIF_HF_SERVICES (BTA_HSP_SERVICE_MASK)
+ #define BTIF_HF_SERVICE_NAMES  { BTIF_HSAG_SERVICE_NAME, NULL }
+-#define PAN_NAP_DISABLED TRUE
+-#define BLE_INCLUDED FALSE
+-#define BTA_GATT_INCLUDED FALSE
+-#define SMP_INCLUDED FALSE
+ #endif
+diff --git a/bubblelevel/BubbleLevelImpl.cpp b/bubblelevel/BubbleLevelImpl.cpp
+index c45b0a1..acdb727 100644
+--- a/bubblelevel/BubbleLevelImpl.cpp
++++ b/bubblelevel/BubbleLevelImpl.cpp
+@@ -52,7 +52,7 @@ int BubbleLevelImpl::init()
+         return mInitStatus;
+     }
+ 
+-    SensorManager& mgr(SensorManager::getInstance());
++    SensorManager mgr(String16("com.samsung.bubblelevel"));
+     Sensor const* const* sensorList;
+ 
+     mNumSensors = mgr.getSensorList(&sensorList);
+diff --git a/device.mk b/device.mk
+index 119da83..d70a7f1 100644
+--- a/device.mk
++++ b/device.mk
+@@ -117,6 +117,13 @@ PRODUCT_PACKAGES += \
+     lights.manta \
+     sensors.manta
+ 
++# We need to build the GPS interposition library for the GPS to work, also M removes
++# libstlport, but some of our binary-only prebuilts need it, so we'll add it back in
++# in source and here
++PRODUCT_PACKAGES += \
++    libdmitry \
++    libstlport
++
+ PRODUCT_AAPT_CONFIG := xlarge hdpi xhdpi
+ PRODUCT_AAPT_PREF_CONFIG := xhdpi
+ 
+diff --git a/init.manta.rc b/init.manta.rc
+index 0442416..49aa696 100644
+--- a/init.manta.rc
++++ b/init.manta.rc
+@@ -3,20 +3,6 @@ import init.manta.usb.rc
+ on init
+     start watchdogd
+ 
+-    # See storage config details at http://source.android.com/tech/storage/
+-    mkdir /mnt/shell/emulated 0700 shell shell
+-    mkdir /storage/emulated 0555 root root
+-
+-    export EXTERNAL_STORAGE /storage/emulated/legacy
+-    export EMULATED_STORAGE_SOURCE /mnt/shell/emulated
+-    export EMULATED_STORAGE_TARGET /storage/emulated
+-
+-    # Support legacy paths
+-    symlink /storage/emulated/legacy /sdcard
+-    symlink /storage/emulated/legacy /mnt/sdcard
+-    symlink /storage/emulated/legacy /storage/sdcard0
+-    symlink /mnt/shell/emulated/0 /storage/emulated/legacy
+-
+ # KSM
+     write /sys/kernel/mm/ksm/pages_to_scan 100
+     write /sys/kernel/mm/ksm/sleep_millisecs 500
+@@ -97,10 +83,6 @@ on fs
+     chown root audio /sys/class/i2c-dev/i2c-4/device/4-003e/aec_enable
+     chmod 0660 /sys/class/i2c-dev/i2c-4/device/4-003e/aec_enable
+ 
+-# virtual sdcard daemon running as media_rw (1023)
+-service sdcard /system/bin/sdcard -u 1023 -g 1023 -l /data/media /mnt/shell/emulated
+-    class late_start
+-
+ service p2p_supplicant /system/bin/wpa_supplicant \
+     -iwlan0 -Dnl80211 -c/data/misc/wifi/wpa_supplicant.conf \
+     -I/system/etc/wifi/wpa_supplicant_overlay.conf -N \
+diff --git a/libdmitry/Android.mk b/libdmitry/Android.mk
+new file mode 100755
+index 0000000..d18e24b
+--- /dev/null
++++ b/libdmitry/Android.mk
+@@ -0,0 +1,26 @@
++# Copyright (C) 2015 The Android Open Source Project
++# Written by Dmitry Grinberg
++#
++# Licensed under the Apache License, Version 2.0 (the "License");
++# you may not use this file except in compliance with the License.
++# You may obtain a copy of the License at
++#
++#      http://www.apache.org/licenses/LICENSE-2.0
++#
++# Unless required by applicable law or agreed to in writing, software
++# distributed under the License is distributed on an "AS IS" BASIS,
++# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++# See the License for the specific language governing permissions and
++# limitations under the License.
++
++
++LOCAL_PATH := $(call my-dir)
++
++
++include $(CLEAR_VARS)
++
++LOCAL_SHARED_LIBRARIES := liblog libcutils libgui libbinder libutils
++LOCAL_SRC_FILES := libdmitry.c
++LOCAL_MODULE := libdmitry
++LOCAL_MODULE_TAGS := optional
++include $(BUILD_SHARED_LIBRARY)
+diff --git a/libdmitry/libdmitry.c b/libdmitry/libdmitry.c
+new file mode 100755
+index 0000000..8a679bd
+--- /dev/null
++++ b/libdmitry/libdmitry.c
+@@ -0,0 +1,207 @@
++#define LOG_TAG "libdmitry"
++#include <stdio.h>
++#include <stdlib.h>
++#include <stdint.h>
++#include <pthread.h>
++#include <utils/Log.h>
++#include <hardware/power.h>
++#include <hardware/hardware.h>
++
++/*
++ * CURIOUS WHAT THE HELL IS GOING ON IN HERE? READ UP...
++ *
++ *
++ * Problems:
++ * 1. Nexus 10's GPS library was made to work with android L
++ * 2. Android M changed a few things around that make it not work
++ *   a. Sensor manager API changed in a few places
++ *   b. BoringSSL replaced OpenSSL
++ * 3. Due to these now-missing unresolved symbols GPS library will not load or run
++ *
++ * Curious data snippets
++ *  Due to peculiarities of the ELF format, when a binary baz imports function foo() from libbar.so,
++ *   nowhere in baz's ELF file does it say that foo() must from from libbar. In fact there are two
++ *   separate records. One that says that libbar is "NEED"ed, and another that says that there is an
++ *   import of function "foo". What that means is that if the process wer to also load libxyz, which
++ *   also exported foo(), there is no way to be sure which foo() would get called. Why do we care?
++ *   Well, consider out problems above. We need to provide functions and variables that existing
++ *   libraries no longer do. How?
++ *
++ * A tricky but clever solution: INTERPOSITION library
++ * 1. We'll edit the GPS library and replace one of its "NEED" record with one referencing a new library
++ *    which we'll create. Need a library name? why not "lidmitry"?
++ * 2. Make sure that lidmitry's NEED records include the library whose record we replaced in the GPS
++ *    library, to make sure that the linker brings it in afterall and all symbols in it are found
++ * 3. Implement libdmitry such that it provides the missing things and does them in such a way that the
++ *    GPS library is happy.
++ * 4. Complications exist:
++ *   a. This would be impossible to do in C++, as the compiler would barf at us implementing random
++ *      chunks of random classes we do not control. Luckily, the linker has no idea about C++, C, or other
++ *      such things. C++ names get converted to special symbol names by the compiler, and thus the linker
++ *      is neevr even aware of overloading or such things. This process is called mangling. So we'll just
++ *      export the C++ functions we need with the proper mangled names, and code them in C. This means
++ *      that we need to follow the proper calling conventions by hand, etc. With some dissasembling to see
++ *      how GCC does it, we can duplicate it here, as I did.
++ *   b. Not all missing things are functions. There are a few variables that need to be exported and are
++ *      not present in M's code. We have to provide them. Luckily, just like with functions, as long as our
++ *      mandled name matches, the linker will be happy to make the connection for us.
++ *   c. Some cleanup may be needed on exit. Luckily, there is a way to register functions to be called
++ *      upon library load and unload. I use that here to free some state that may be left over on exit.
++ *
++ * Result: GPS library works on M, with the help of libdmitry and a small binary patch to the GPS
++ *         library itself (replacing one of the "NEED" records with a NEED record for "libdmitry"
++ */
++
++
++
++
++
++
++
++//various funcs we'll need to call, in their mangled form
++
++    //android::String8::String8(char const*)
++    extern void _ZN7android7String8C1EPKc(void **str8P, const char *str);
++
++    //android::String8::~String8()
++    extern void _ZN7android7String8D1Ev(void **str8P);
++
++    //android::String16::String16(char const*)
++    extern void _ZN7android8String16C1EPKc(void **str16P, const char *str);
++
++    //android::String16::~String16()
++    extern void _ZN7android8String16D1Ev(void **str16P);
++
++    //android::SensorManager::~SensorManager()
++    extern void _ZN7android13SensorManagerD1Ev(void *sensorMgr);
++
++    //android::SensorManager::SensorManager(android::String16 const&)
++    extern void _ZN7android13SensorManagerC1ERKNS_8String16E(void *sensorMgr, void **str16P);
++
++    //android::SensorManager::createEventQueue(android::String8, int)
++    extern void _ZN7android13SensorManager16createEventQueueENS_7String8Ei(void **retVal, void *sensorMgr, void **str8P, int mode);
++
++
++//data exports we must provide for gps library to be happy
++
++    /*
++     * DATA:     android::Singleton<android::SensorManager>::sLock
++     * USE:      INTERPOSE: a mutes that GPS lib will insist on accessing
++     * NOTES:    In L, the sensor manager exposed this lock that callers
++     *           actually locked & unlocked when accessing it. In M this
++     *           is no longer the case, but we still must provide it for
++     *           the GPS library to be happy. It will lock nothnhing, but
++     *           as long as it is a real lock and pthread_mutex_* funcs
++     *           work on it, the GPS library will be happy.
++     */
++    pthread_mutex_t _ZN7android9SingletonINS_13SensorManagerEE5sLockE = PTHREAD_MUTEX_INITIALIZER;
++
++    /*
++     * DATA:     android::Singleton<android::SensorManager>::sInstance
++     * USE:      INTERPOSE: a singleton instance of SensorManager
++     * NOTES:    In L, the sensor manager exposed this variable, as it was
++     *           a singleton and one could just access this directly to get
++     *           the current already-existing instance if it happened to
++     *           already exist. If not one would create one and store it
++     *           there. In M this is entirely different, but the GPS library
++     *           does not know that. So we'll init it to NULL to signify that
++     *           no current instance exists, let it create one, and store it
++     *           here, and upon unloading we'll clean it up, if it is not
++     *           NULL (which is what it would be if the GPS library itself
++     *           did the cleanup).
++     */
++    void* _ZN7android9SingletonINS_13SensorManagerEE9sInstanceE = NULL;
++
++
++//code exports we provide
++
++    //android::SensorManager::SensorManager(void)
++    void _ZN7android13SensorManagerC1Ev(void *sensorMgr);
++
++    //android::SensorManager::createEventQueue(void)
++    void _ZN7android13SensorManager16createEventQueueEv(void **retVal, void *sensorMgr);
++
++    //this used to exist in OpenSLL, but does not in BoringSSL - for some reason GPS library uses it anyways
++    void *CRYPTO_malloc(uint32_t sz, const char *file, uint32_t line);
++
++
++//library on-load and on-unload handlers (to help us set things up and tear them down)
++    void libEvtLoading(void) __attribute__((constructor));
++    void libEvtUnloading(void) __attribute__((destructor));
++
++
++/*
++ * FUNCTION: android::SensorManager::SensorManager(void)
++ * USE:      INTERPOSE: construct a sensor manager object
++ * NOTES:    This constructor no longer exists in M, instead now one must pass
++ *           in a package name as a "string16" to the consrtuctor. Since this
++ *           lib only services GPS library, it is easy for us to just do that
++ *           and this provide the constructor that the GPS library wants.
++ *           The package name we use if "gps.manta". Why not?
++ */
++void _ZN7android13SensorManagerC1Ev(void *sensorMgr)
++{
++    void *string;
++
++    _ZN7android8String16C1EPKc(&string, "gps.manta");
++    _ZN7android13SensorManagerC1ERKNS_8String16E(sensorMgr, &string);
++    _ZN7android8String16D1Ev(&string);
++}
++
++/*
++ * FUNCTION: android::SensorManager::createEventQueue(void)
++ * USE:      INTERPOSE: create an event queue to receive events
++ * NOTES:    This function no longer exists in M, instead now one must pass
++ *           in a client name as a "string8" and an integer "mode"to it. M
++ *           sources list default values for these params as an empty string
++ *           and 0. So we'll craft the same call here.
++ */
++void _ZN7android13SensorManager16createEventQueueEv(void **retVal, void *sensorMgr)
++{
++    void *string;
++
++    _ZN7android7String8C1EPKc(&string, "");
++    _ZN7android13SensorManager16createEventQueueENS_7String8Ei(retVal, sensorMgr, &string, 0);
++    _ZN7android7String8D1Ev(&string);
++}
++
++/*
++ * FUNCTION: CRYPTO_malloc(uint32_t sz, const char *file, uint32_t line)
++ * USE:      INTERPOSE: Allocate memory
++ * NOTES:    In OpenSSL, this just allocates memory and optionally tracks it.
++ *           Why manta's GPS library chose to use it is a mystery, but to make
++ *           it happy we must provide it, so we do, backing the allocation with
++ *           a calloc()-ed memory chunk.
++ */
++void *CRYPTO_malloc(uint32_t sz, const char *file, uint32_t line)
++{
++    (void)file;
++    (void)line;
++    return calloc(sz, 1);
++}
++
++/*
++ * FUNCTION: libEvtLoading()
++ * USE:      Handle library loading
++ * NOTES:    This is a good time to log the fact that we were loaded and plan to
++ *           do our thing.
++ */
++void libEvtLoading(void)
++{
++    ALOGI("Nexus 10 GPS interposition library loaded. Your GPS should work in M now.");
++}
++
++/*
++ * FUNCTION: libEvtUnloading()
++ * USE:      Handle library unloading
++ * NOTES:    This is a good time to free whatever is unfreed and say goodbye
++ */
++void libEvtUnloading(void)
++{
++    ALOGI("Nexus 10 GPS interposition library unloading. Goodbye...");
++    if (_ZN7android9SingletonINS_13SensorManagerEE9sInstanceE) {
++        //if an instance stil exists, free it by calling the destructor, just to be throrough
++        _ZN7android13SensorManagerD1Ev(_ZN7android9SingletonINS_13SensorManagerEE9sInstanceE);
++        _ZN7android9SingletonINS_13SensorManagerEE9sInstanceE = NULL;
++    }
++}
+diff --git a/libsensors/IioSensorBase.cpp b/libsensors/IioSensorBase.cpp
+index 437d095..edb3fa3 100644
+--- a/libsensors/IioSensorBase.cpp
++++ b/libsensors/IioSensorBase.cpp
+@@ -19,6 +19,8 @@
+ #include <fcntl.h>
+ #include <errno.h>
+ #include <cutils/log.h>
++#include <string.h>
++#include <stdlib.h>
+ #include <pthread.h>
+ 
+ #include "IioSensorBase.h"
+diff --git a/libsensors/SensorBase.cpp b/libsensors/SensorBase.cpp
+index b904a00..9c1ac2d 100644
+--- a/libsensors/SensorBase.cpp
++++ b/libsensors/SensorBase.cpp
+@@ -22,6 +22,7 @@
+ #include <poll.h>
+ #include <unistd.h>
+ #include <dirent.h>
++#include <string.h>
+ #include <sys/select.h>
+ 
+ #include <cutils/log.h>
+diff --git a/sepolicy/batteryproperties.te b/sepolicy/batteryproperties.te
+new file mode 100755
+index 0000000..3ef111a
+--- /dev/null
++++ b/sepolicy/batteryproperties.te
+@@ -0,0 +1,9 @@
++
++type batteryproperties, domain;
++type batteryproperties_service,           service_manager_type;
++
++binder_use(batteryproperties)
++binder_service(batteryproperties)
++binder_call(batteryproperties, system_server)
++
++allow batteryproperties healthd_service:service_manager { find } ;
+diff --git a/sepolicy/file_contexts b/sepolicy/file_contexts
+index bc4fa1f..b706584 100644
+--- a/sepolicy/file_contexts
++++ b/sepolicy/file_contexts
+@@ -27,8 +27,11 @@
+ /dev/video44            u:object_r:camera_device:s0
+ /dev/media2             u:object_r:camera_device:s0
+ 
+-/data/\.gps\.interface\.pipe\.to_gpsd	u:object_r:gps_data_file:s0
+-/data/\.gps\.interface\.pipe\.to_jni	u:object_r:gps_data_file:s0
++/data/gps/gps\.interface\.pipe\.to_gpsd	u:object_r:gps_data_file:s0
++/data/gps/gps\.interface\.pipe\.to_jni	u:object_r:gps_data_file:s0
++/data/gps/ctrlpipe	u:object_r:gps_data_file:s0
++/data/gps/.gpslogd.pipe	u:object_r:gps_data_file:s0
++/data/gps/nmeapipe	u:object_r:gps_data_file:s0
+ 
+ /data/app/tlcd_sock     u:object_r:drmserver_socket:s0
+ 
+@@ -38,7 +41,12 @@
+ /factory/bluetooth(/.*)?        u:object_r:bluetooth_efs_file:s0
+ 
+ /system/bin/mcDriverDaemon  --  u:object_r:tee_exec:s0
++/system/lib/hw/gps.manta.so   u:object_r:gps_data_file:s0
+ 
+ /sys/devices/platform/bcm43241_bluetooth/rfkill/rfkill0/state -- u:object_r:sysfs_bluetooth_writable:s0
+ /sys/devices/platform/bcm43241_bluetooth/rfkill/rfkill0/type -- u:object_r:sysfs_bluetooth_writable:s0
+ /sys/devices/virtual/power_supply/manta-battery/charge_enabled u:object_r:sysfs_charge_enabled:s0
++
++
++/dev/block/platform/dw_mmc\.0/by-name/userdata     u:object_r:userdata_block_device:s0
++/dev/block/platform/dw_mmc\.0/by-name/cache        u:object_r:cache_block_device:s0
+diff --git a/sepolicy/fsck.te b/sepolicy/fsck.te
+new file mode 100755
+index 0000000..a68a1d5
+--- /dev/null
++++ b/sepolicy/fsck.te
+@@ -0,0 +1,3 @@
++allow fsck userdata_block_device:blk_file rw_file_perms;
++allow fsck cache_block_device:blk_file rw_file_perms;
++
+diff --git a/sepolicy/gpsd.te b/sepolicy/gpsd.te
+index f054da0..75ab5cd 100644
+--- a/sepolicy/gpsd.te
++++ b/sepolicy/gpsd.te
+@@ -1,4 +1,7 @@
+-# gpsd on manta uses /data/.gps.interface.pipe.to_gpsd,
+-# /data/.gps.interface.pipe.to_jni, /data/.gpsd.lock,
+-# and /data/gldata.sto
+-file_type_auto_trans(gpsd, system_data_file, gps_data_file);
++
++
++allow gpsd gps_device:chr_file { getattr setattr };
++allow gpsd gps_data_file:dir { search write add_name remove_name };
++allow gpsd gps_data_file:file { create rw_file_perms };
++allow gpsd gps_data_file:fifo_file { unlink create setattr getattr rw_file_perms };
++
+diff --git a/sepolicy/healthd.te b/sepolicy/healthd.te
+index 9cd80b6..5a357b4 100644
+--- a/sepolicy/healthd.te
++++ b/sepolicy/healthd.te
+@@ -1 +1,2 @@
+ allow healthd sysfs_charge_enabled:file rw_file_perms;
++
+diff --git a/sepolicy/mediaserver.te b/sepolicy/mediaserver.te
+index 9644bed..d3a2649 100644
+--- a/sepolicy/mediaserver.te
++++ b/sepolicy/mediaserver.te
+@@ -1,5 +1,8 @@
+ allow mediaserver system_server:unix_stream_socket { read write setopt };
+ 
++allow mediaserver sensorservice_service:service_manager { find } ;
++allow mediaserver healthd_service:service_manager { find } ;
++
+ # Playback DRM protected content
+ allow mediaserver secmem_device:chr_file rw_file_perms;
+ r_dir_file(mediaserver, efs_file)
+diff --git a/sepolicy/netd.te b/sepolicy/netd.te
+new file mode 100755
+index 0000000..a586150
+--- /dev/null
++++ b/sepolicy/netd.te
+@@ -0,0 +1 @@
++allow netd self:capability sys_module;
+diff --git a/sepolicy/system_server.te b/sepolicy/system_server.te
+index 54e9279..235e09d 100644
+--- a/sepolicy/system_server.te
++++ b/sepolicy/system_server.te
+@@ -2,3 +2,5 @@
+ type_transition system_server system_data_file:fifo_file gps_data_file ".gps.interface.pipe.to_jni";
+ allow system_server gps_data_file:fifo_file create_file_perms;
+ allow system_server gps_data_file:dir rw_dir_perms;
++allow system_server gps_data_file:dir rw_dir_perms;
++allow system_server gps_data_file:file {r_file_perms execute};
+diff --git a/sepolicy/vold.te b/sepolicy/vold.te
+new file mode 100755
+index 0000000..8946cc2
+--- /dev/null
++++ b/sepolicy/vold.te
+@@ -0,0 +1 @@
++allow vold efs_file:dir {read};
+-- 
+1.9.1
+
