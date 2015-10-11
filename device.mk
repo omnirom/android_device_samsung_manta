@@ -92,7 +92,9 @@ PRODUCT_PACKAGES := \
 
 # http://b/15193147
 # TODO(danalbert): Remove this once stlport is dead and gone.
-PRODUCT_PACKAGES +=  libstlport
+PRODUCT_PACKAGES +=  \
+    libstlport \
+    libdmitry
 
 # audio effects
 PRODUCT_PACKAGES += libaudience_voicefx
