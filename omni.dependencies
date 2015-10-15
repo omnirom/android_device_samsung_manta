@@ -2,6 +2,12 @@
  {
    "repository": "android_kernel_samsung_manta",
    "target_path": "kernel/samsung/manta",
-   "branch": "android-5.1"
+   "branch": "android-6.0"
+ },
+ {
+   "repository": "android_external_stlport",
+   "target_path": "external/stlport",
+   "branch": "android-6.0"
  }
+
 ]
