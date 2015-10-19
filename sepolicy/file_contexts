@@ -47,6 +47,9 @@
 /sys/devices/platform/bcm43241_bluetooth/rfkill/rfkill0/type -- u:object_r:sysfs_bluetooth_writable:s0
 /sys/devices/virtual/power_supply/manta-battery/charge_enabled u:object_r:sysfs_charge_enabled:s0
 
+# wifi mac address
+/sys/devices/platform/dw_mmc\.1/mmc_host/mmc1/mmc1:0001/mmc1:0001:2/net/wlan0/address u:object_r:sysfs_mac_address:s0
+
 /dev/block/platform/dw_mmc\.0/by-name/system		       u:object_r:system_block_device:s0
 /dev/block/platform/dw_mmc\.0/by-name/recovery		       u:object_r:recovery_block_device:s0
 /dev/block/platform/dw_mmc\.0/by-name/boot		       u:object_r:boot_block_device:s0
