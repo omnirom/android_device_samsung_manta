@@ -40,6 +40,10 @@ TARGET_KERNEL_SOURCE := kernel/samsung/manta
 BOARD_HAVE_BLUETOOTH := true
 BOARD_HAVE_BLUETOOTH_BCM := true
 
+# workaround for a specific manta problem in
+# hardware/broadcom/libbt
+BCM_BLUETOOTH_MANTA_BUG := true
+
 TARGET_NO_BOOTLOADER := true
 
 TARGET_NO_RADIOIMAGE := true
