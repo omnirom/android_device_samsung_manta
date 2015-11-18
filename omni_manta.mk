@@ -48,4 +48,9 @@ PRODUCT_MODEL := Nexus 10
 PRODUCT_MANUFACTURER := Samsung
 PRODUCT_RESTRICT_VENDOR_FILES := false
 
+PRODUCT_BUILD_PROP_OVERRIDES += \
+    PRODUCT_NAME=mantaray \
+    BUILD_FINGERPRINT=google/mantaray/manta:5.1.1/LMY47V/1836172:user/release-keys \
+    PRIVATE_BUILD_DESC="mantaray-user 5.1.1 LMY47V 1836172 release-keys"
+
 $(call inherit-product-if-exists, vendor/samsung/manta/manta-vendor.mk)
