@@ -222,4 +222,9 @@
     <!-- Doze: force using accelerometer as pick up sensor -->
 <!--    <bool name="config_dozeUseAccelerometer">true</bool> -->
 
+    <!-- Older sensors are not setting event.timestamp correctly.  Setting to
+          true will use SystemClock.elapsedRealtimeNanos() to set timestamp-->
+    <bool name="config_useSystemClockforSensors">true</bool>
+
+
 </resources>
