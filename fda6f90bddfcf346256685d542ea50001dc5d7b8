@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b8f5b13e_49317ee7",
+        "filename": "device.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1000262
+      },
+      "writtenOn": "2016-01-12T11:44:38Z",
+      "side": 1,
+      "message": "Speed doesnt really help rather set dalvik.vm.dex2oat-threads\u003d3 to allow it to actually optimize the apps.",
+      "range": {
+        "startLine": 188,
+        "startChar": 4,
+        "endLine": 188,
+        "endChar": 34
+      },
+      "revId": "fda6f90bddfcf346256685d542ea50001dc5d7b8",
+      "serverId": "56841c99-7c94-43d4-bf0b-cb4707e66d55",
+      "unresolved": false
+    }
+  ]
+}
