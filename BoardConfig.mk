@@ -97,7 +97,7 @@ TARGET_RELEASETOOLS_EXTENSIONS := device/samsung/manta
 #TWRP
 TARGET_PREBUILT_KERNEL := device/samsung/manta/kernel
 #TARGET_RECOVERY_UI_LIB := librecovery_ui_manta
-#TARGET_RECOVERY_UPDATER_LIBS += librecovery_updater_manta
+TARGET_RECOVERY_UPDATER_LIBS += librecovery_updater_manta
 TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
 TW_THEME := landscape_hdpi
 BOARD_USE_CUSTOM_RECOVERY_FONT := \"roboto_23x41.h\"
