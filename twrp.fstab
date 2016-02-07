@@ -2,10 +2,11 @@
 
 /system		ext4		/dev/block/platform/dw_mmc.0/by-name/system
 /cache		ext4		/dev/block/platform/dw_mmc.0/by-name/cache
+/data		f2fs		/dev/block/platform/dw_mmc.0/by-name/userdata   flags=encryptable=/dev/block/platform/dw_mmc.0/by-name/metadata
 /data		ext4		/dev/block/platform/dw_mmc.0/by-name/userdata   flags=encryptable=/dev/block/platform/dw_mmc.0/by-name/metadata
 /boot		emmc		/dev/block/platform/dw_mmc.0/by-name/boot
 /recovery	emmc		/dev/block/platform/dw_mmc.0/by-name/recovery
 /misc		emmc		/dev/block/platform/dw_mmc.0/by-name/misc
 /bootloader	emmc		/dev/block/mmcblk0boot0
-/usb-otg      vfat          /dev/block/sda1           flags=removable;storage;display=USB-OTG
+/usb-otg        vfat            /dev/block/sda1                                 flags=removable;storage;display=USB-OTG
 
