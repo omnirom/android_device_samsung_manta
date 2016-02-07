@@ -6,6 +6,7 @@
 
 /dev/block/platform/dw_mmc.0/by-name/system     /system             ext4      ro                                                    wait
 /dev/block/platform/dw_mmc.0/by-name/cache      /cache              ext4      noatime,nosuid,nodev,nomblk_io_submit,errors=panic    wait,check
+/dev/block/platform/dw_mmc.0/by-name/userdata   /data               f2fs      noatime,nosuid,nodev,errors=panic                     wait,check,encryptable=/dev/block/platform/dw_mmc.0/by-name/metadata
 /dev/block/platform/dw_mmc.0/by-name/userdata   /data               ext4      noatime,nosuid,nodev,nomblk_io_submit,errors=panic    wait,check,encryptable=/dev/block/platform/dw_mmc.0/by-name/metadata
 /dev/block/platform/dw_mmc.0/by-name/efs        /factory            ext4      noatime,nosuid,nodev,rw                               wait
 /dev/block/platform/dw_mmc.0/by-name/boot       /boot               emmc      defaults                                              defaults
