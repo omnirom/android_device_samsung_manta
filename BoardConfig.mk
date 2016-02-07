@@ -105,6 +105,7 @@ RECOVERY_SDCARD_ON_DATA := true
 TW_CUSTOM_BATTERY_PATH := /
 TW_INCLUDE_CRYPTO := true
 TW_NO_CPU_TEMP := true
+TARGET_USERIMAGES_USE_F2FS := true
 
 BOARD_SEPOLICY_DIRS += \
 	device/samsung/manta/sepolicy
