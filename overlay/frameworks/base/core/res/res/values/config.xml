@@ -223,4 +223,6 @@
     <!-- Doze: force using accelerometer as pick up sensor -->
 <!--    <bool name="config_dozeUseAccelerometer">true</bool> -->
 
+    <!-- Boolean to indicate that the device is WiFi only -->
+    <bool name="config_device_wifi_only">true</bool>
 </resources>
