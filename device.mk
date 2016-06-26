@@ -160,7 +160,8 @@ PRODUCT_PACKAGES += \
     power.manta
 
 PRODUCT_PACKAGES += \
-    camera.exynos5
+    camera.exynos5 \
+    SnapdragonCamera
 
 # Filesystem management tools
 PRODUCT_PACKAGES += \
