@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ * Copyright (C) 2008 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ -->
+
+<resources>
+    <!-- Camera Preferences Picture size dialog box entries -->
+    <string-array name="pref_camera_picturesize_entries" translatable="false">
+        <item>(1:1) 1.9 MP</item>    
+        <item>(4:3) 4.9 MP</item>    
+        <item>(4:3) 3.1 MP</item>
+        <item>(4:3) 1.4 MP</item>
+        <item>(4:3) 1.0 MP</item>
+        <item>(4:3) 0.3 MP</item>
+        <item>(4:3) 0.1 MP</item>
+        <item>(16:9) 3.7 MP</item>
+        <item>(16:9) 1.1 MP</item>
+        <item>(16:9) 0.9 MP</item>
+    </string-array>
+    
+    <!-- When launching the camera app first time, we will set the picture
+         size to the first one in the list that is also supported by the
+         driver -->
+    <string-array name="pref_camera_picturesize_entryvalues" translatable="false">
+        <item>1392x1392</item>    
+        <item>2560x1920</item>    
+        <item>2048x1536</item>
+        <item>1392x1040</item>
+        <item>1152x864</item>
+        <item>640x480</item>
+        <item>320x240</item>
+        <item>2560x1440</item>
+        <item>1392x784</item>
+        <item>1280x720</item>
+    </string-array>
+
+</resources>
