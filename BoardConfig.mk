@@ -109,7 +109,7 @@ TW_NO_CPU_TEMP := true
 BOARD_SEPOLICY_DIRS += \
 	device/samsung/manta/sepolicy
 
-MALLOC_IMPL := dlmalloc
+MALLOC_SVELTE := true
 
 BOARD_INV_LIBMLLITE_FROM_SOURCE := true
 
