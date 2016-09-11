@@ -13,15 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 LOCAL_PATH := $(call my-dir)
-
 
 include $(CLEAR_VARS)
 
-LOCAL_SHARED_LIBRARIES := liblog libcutils libgui libbinder libutils
-LOCAL_SRC_FILES := libdmitry.c
-LOCAL_MODULE := libdmitry
+LOCAL_SHARED_LIBRARIES := liblog libhardware_legacy libgui libbinder libutils
+LOCAL_SRC_FILES := libgpsd-compat.c
+LOCAL_MODULE := libgpsd-compat
 LOCAL_MODULE_TAGS := optional
-include $(BUILD_SHARED_LIBRARY)
 
+include $(BUILD_SHARED_LIBRARY)
