@@ -106,8 +106,9 @@ TW_CUSTOM_BATTERY_PATH := /
 TW_INCLUDE_CRYPTO := true
 TW_NO_CPU_TEMP := true
 
-BOARD_SEPOLICY_DIRS += \
-	device/samsung/manta/sepolicy
+BOARD_SEPOLICY_DIRS += device/samsung/manta/sepolicy
+
+BOARD_SECCOMP_POLICY += device/samsung/manta/seccomp
 
 MALLOC_SVELTE := true
 
