@@ -1,6 +1,7 @@
 import init.manta.usb.rc
 
 on init
+export LD_SHIM_LIBS "/system/vendor/lib/libwvm.so|widevine_shim.so"
     start watchdogd
 
     # Support legacy paths

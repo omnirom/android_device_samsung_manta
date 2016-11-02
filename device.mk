@@ -94,7 +94,8 @@ PRODUCT_PACKAGES := \
 # TODO(danalbert): Remove this once stlport is dead and gone.
 PRODUCT_PACKAGES +=  \
     libstlport \
-    libgpsd-compat
+    libgpsd-compat \
+    widevine_shim
 
 # audio effects
 PRODUCT_PACKAGES += libaudience_voicefx
