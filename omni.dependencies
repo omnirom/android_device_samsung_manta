@@ -1,15 +1,18 @@
 [
  {
+   "remote": "omnirom",
    "repository": "android_kernel_samsung_manta",
    "target_path": "kernel/samsung/manta",
-   "branch": "android-7.0"
+   "branch": "android-7.1"
  },
  {
+   "remote": "omnirom",
    "repository": "android_external_stlport",
    "target_path": "external/stlport",
    "branch": "android-7.0"
  },
  {
+   "remote": "omnirom",
    "repository": "android_hardware_samsung_slsi_exynos5",
    "target_path": "hardware/samsung_slsi/exynos5",
    "branch": "android-7.0"
