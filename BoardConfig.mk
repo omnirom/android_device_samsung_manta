@@ -43,6 +43,7 @@ BOARD_HAVE_BLUETOOTH_BCM := true
 # workaround for a specific manta problem in
 # hardware/broadcom/libbt
 BCM_BLUETOOTH_MANTA_BUG := true
+BOARD_NEEDS_MEMORYHEAPION := true
 
 TARGET_NO_BOOTLOADER := true
 
