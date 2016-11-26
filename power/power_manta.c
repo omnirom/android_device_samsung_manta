@@ -284,22 +284,22 @@ static void manta_power_hint(struct power_module *module, power_hint_t hint,
         }
         pthread_mutex_unlock(&manta->lock);
         break;
-        case POWER_HINT_POWER_PROFILE:
+/*        case POWER_HINT_POWER_PROFILE:
 #ifdef DEBUG
             ALOGI("POWER_HINT_POWER_PROFILE %s", (char*)data);
 #endif
             // profile is contributed as string with key value
             // pairs separated with ":"
             apply_profile((char*)data, manta);
-            break;
+            break;*/
     case POWER_HINT_LOW_POWER:
-/*        pthread_mutex_lock(&manta->lock);
+        pthread_mutex_lock(&manta->lock);
         if (data)
             sysfs_write(CPU_MAX_FREQ_PATH, LOW_POWER_MAX_FREQ);
         else
             sysfs_write(CPU_MAX_FREQ_PATH, NORMAL_MAX_FREQ);
         low_power_mode = data;
-        pthread_mutex_unlock(&manta->lock); */
+        pthread_mutex_unlock(&manta->lock);
 #ifdef DEBUG
             // handled by power profiles!
             ALOGI("POWER_HINT_LOW_POWER");

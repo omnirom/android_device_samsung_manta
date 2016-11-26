@@ -211,7 +211,7 @@
         <item>dnd</item>
     </string-array>
 
-    <bool name="config_powerProfilesSupported">true</bool>
+<!--    <bool name="config_powerProfilesSupported">true</bool> -->
 
     <!-- Doze mode -->
     <string name="config_dozeComponent">com.android.systemui/com.android.systemui.doze.DozeService</string>
