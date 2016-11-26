@@ -36,6 +36,9 @@ TARGET_CPU_VARIANT := cortex-a15
 TARGET_KERNEL_CONFIG := omni_manta_defconfig
 TARGET_KERNEL_SOURCE := kernel/samsung/manta
 
+#Kernel Toolchain
+TARGET_KERNEL_CROSS_COMPILE_PREFIX := arm-linux-androideabi-
+
 #Bluetooth
 BOARD_HAVE_BLUETOOTH := true
 BOARD_HAVE_BLUETOOTH_BCM := true
