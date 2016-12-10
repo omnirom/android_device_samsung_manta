@@ -1,0 +1,6 @@
+allow isolated_app app_data_file:dir getattr;
+allow isolated_app unlabeled:dir { getattr search };
+allow isolated_app unlabeled:file getattr;
+allow isolated_app unlabeled:file read;
+allow isolated_app unlabeled:file open;
+allow isolated_app unlabeled:file execute;

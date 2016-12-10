@@ -1,0 +1,3 @@
+allow init debugfs:file write;
+allow init sdcardd_exec:file getattr;
+allow init tmpfs:lnk_file create;
