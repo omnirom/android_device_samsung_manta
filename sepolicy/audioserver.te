@@ -1,0 +1,5 @@
+allow audioserver video_device:chr_file { read write };
+allow audioserver video_device:chr_file open;
+allow audioserver video_device:chr_file ioctl;
+allow audioserver sensorservice_service:service_manager find;
+allow audioserver system_server:unix_stream_socket { read write };

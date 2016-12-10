@@ -1,0 +1,4 @@
+allow shared_relro unlabeled:file read;
+allow shared_relro unlabeled:file open;
+allow shared_relro unlabeled:file getattr;
+allow shared_relro unlabeled:file execute;

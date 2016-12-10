@@ -1,0 +1,4 @@
+allow nfc self:process ptrace;
+allow nfc unlabeled:dir search;
+allow nfc unlabeled:file getattr;
+allow nfc unlabeled:file read;

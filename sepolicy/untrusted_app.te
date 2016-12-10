@@ -1,0 +1,5 @@
+allow untrusted_app unlabeled:dir { getattr search };
+allow untrusted_app unlabeled:file read;
+allow untrusted_app unlabeled:lnk_file read;
+allow untrusted_app unlabeled:file { getattr open };
+allow untrusted_app unlabeled:file execute;
