@@ -159,15 +159,20 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     power.manta
 
+# camera
 PRODUCT_PACKAGES += \
     camera.exynos5 \
     SnapdragonCamera
+
+PRODUCT_PROPERTY_OVERRIDES := \
+    media.stagefright.legacyencoder=true \
+    media.stagefright.less-secure=true
 
 # Filesystem management tools
 PRODUCT_PACKAGES += \
     e2fsck
 
-PRODUCT_PROPERTY_OVERRIDES := \
+PRODUCT_PROPERTY_OVERRIDES += \
     wifi.interface=wlan0 \
     ro.opengles.version=196609 \
     ro.sf.lcd_density=320 \
