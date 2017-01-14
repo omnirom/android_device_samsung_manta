@@ -167,6 +167,9 @@ PRODUCT_PACKAGES += \
 PRODUCT_PROPERTY_OVERRIDES := \
     media.stagefright.legacyencoder=true \
     media.stagefright.less-secure=true
+# telephony
+PRODUCT_PACKAGES += telephony-ext
+PRODUCT_BOOT_JARS += telephony-ext
 
 # Filesystem management tools
 PRODUCT_PACKAGES += \
