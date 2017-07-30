@@ -1,0 +1,3 @@
+allow mediacodec system_file:dir { open read };
+allow mediacodec sysfs:file { open read getattr };
+
