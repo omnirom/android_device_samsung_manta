@@ -1,2 +1,6 @@
 # NFC Tile
 allow platform_app nfc_service:service_manager find;
+
+allow platform_app unlabeled:dir search;
+allow platform_app unlabeled:file { read open getattr };
+
