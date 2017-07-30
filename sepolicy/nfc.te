@@ -1,0 +1,2 @@
+allow nfc self:process ptrace;
+
