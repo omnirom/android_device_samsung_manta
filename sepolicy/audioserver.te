@@ -1,0 +1,4 @@
+allow audioserver video_device:chr_file { read write open iotcl};
+allow audioserver sensorservice_service:service_manager find;
+allow audioserver system_server:unix_stream_socket { read write };
+

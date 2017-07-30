@@ -1,0 +1,3 @@
+allow nfc self:process ptrace;
+allow nfc unlabled:dir search;
+allow nfc unlabled:file { read getattr };
