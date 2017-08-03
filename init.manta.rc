@@ -1,3 +1,4 @@
+import init.omni.rc
 import init.manta.usb.rc
 
 on init
