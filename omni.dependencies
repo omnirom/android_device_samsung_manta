@@ -1,9 +1,9 @@
 [
  {
-   "remote": "omnirom",
-   "repository": "android_kernel_samsung_manta",
+   "remote": "github",
+   "repository": "scanno/android_kernel_samsung_manta",
    "target_path": "kernel/samsung/manta",
-   "revision": "android-7.1"
+   "revision": "android-8.0"
  },
  {
    "remote": "omnirom",
