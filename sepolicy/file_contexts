@@ -27,7 +27,7 @@
 /dev/media2                                                      u:object_r:camera_device:s0
 
 # GPS
-/dev/ttySAC1                                                     u:object_r:gps_device:s0
+#/dev/ttySAC1                                                     u:object_r:gps_device:s0
 
 /data/app/tlcd_sock                                              u:object_r:drmserver_socket:s0
 
