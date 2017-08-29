@@ -19,9 +19,9 @@
 
 #include "BubbleLevel.h"
 #include <utils/Looper.h>
-#include <gui/Sensor.h>
-#include <gui/SensorManager.h>
-#include <gui/SensorEventQueue.h>
+#include <sensor/Sensor.h>
+#include <sensor/SensorManager.h>
+#include <sensor/SensorEventQueue.h>
 
 
 namespace android {
